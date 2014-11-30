@@ -1,10 +1,13 @@
 Link: http://www.ccse.kfupm.edu.sa/~ahmadsm/coe589-121/cao2012-image-forgery.pdf
 
+
 Details of Algorithm:
 
-1) Divide the block into small blocks of 16x16 or any square 
+1) Divide the block into small blocks of 16x16 or 8x8
 2) Apply DCT on blocks
-3) Extract Feature vector from DCT of blocks
+3) Extract DCT coefficients of lower frequency by selecting coefficients from 1st square of [W/2,W/2] size
+4) Overlap a circle of radius W/2 with origin at center of square, and form vectors of dimension 4 as explained in the paper
+5) similarity between feature vectors is calculated
 
 
 == Work in Progress == 
