@@ -54,7 +54,7 @@ def pointsInsideCircle(radius):
 	
 def compare(v1,v2,posA,posB,Dsim,Nd):
 	sim = sqrt(pow(v1[0]-v2[0],2)+pow(v1[1]-v2[1],2)+pow(v1[2]-v2[2],2)+pow(v1[3]-v2[3],2))
-	if sim < Dsim:
+	if sim > Dsim and sim < 0.2:
 		d = sqrt(pow(posA[0]-posB[0],2)+pow(posB[0]-posB[1],2))
 		if d > Nd:
 			print [d,sim]
@@ -65,4 +65,20 @@ def compare(v1,v2,posA,posB,Dsim,Nd):
 		return False
 
 		
-
+def zigzag(max_value):
+	coeffs = [[],[],[],[]]
+	counter = 0
+	index = 0
+	for i in range(0,max_value+1):
+		j = i
+		for k in range(0,i+1):
+			if i%2 == 0:
+				coeffs[index].append([j,k])
+			else:
+				coeffs[index].append([k,j])
+			j=j-1
+			counter = counter+1
+			if counter%max_value == 0:
+				index = index+1
+	coeffs[index].append([0,max_value+1])
+	return coeffs

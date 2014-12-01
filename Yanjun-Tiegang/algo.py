@@ -1,7 +1,7 @@
 import sys
 import cv2
 import numpy as np
-from utils import pointsInsideCircle, compare
+from utils import pointsInsideCircle, compare, zigzag
 from math import pi as PI
 
 
@@ -9,8 +9,8 @@ W	= 8 			#block size for comparision
 Dsim	= 0.1			#threshold for symmetry
 Nd	= 25			#nearest block
 
-quadrants_points = pointsInsideCircle(W/2)	#(i,j) position of blocks which are partially/completely inside circle of radius W/2
-
+quadrants_points = pointsInsideCircle(W/4)	#(i,j) position of blocks which are partially/completely inside circle of radius W/2
+zigzag_points = zigzag(W/2)
 test_image = cv2.imread(sys.argv[1],0)
 height,width = test_image.shape[:2]
 #print (height,width)
@@ -19,20 +19,33 @@ for j in range(0,height-W+1):
 	for i in range(0,width-W+1):
 		block = test_image[j:j+W,i:i+W]
 		dct_block =  cv2.dct(np.float32(block))
-		feature_block = dct_block[0:W/2,0:W/2]
+		feature_block = [[],[],[],[]]
+		for index,coeff_list in enumerate(zigzag_points):
+			for coeff in coeff_list:
+				feature_block[index].append(dct_block[coeff[0],coeff[1]])
+			
+		feature_block_np = np.array(feature_block)
+		
 		feature_vector = []
 		for quadrant,points in quadrants_points.iteritems():
 			summ = 0
 			for point in points:
-				summ = summ + dct_block[point[0],point[1]]
+				summ = summ + feature_block_np[point[0],point[1]]
 			feature_vector.append(summ/PI)
 		vectors_list.append(np.array(feature_vector))
 	 
 vectors_list2 = cv2.sort(np.array(vectors_list),cv2.SORT_EVERY_ROW)
+print "vectors calculated"
+import json
+with open('data.json', 'w') as outfile:
+	json.dump(vectors_list2.tolist(), outfile)
+
 
 i=0
 blocks = []
 for i in range(0,len(vectors_list)):
+	if i%width == 0:
+		print i/width
 	posA = [i/width,i%width]
 	j = i+1
 	for j in range(i+1,len(vectors_list)):
